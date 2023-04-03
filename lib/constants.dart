@@ -1,0 +1,1 @@
+const kQuizContainerFactor = 0.25;
