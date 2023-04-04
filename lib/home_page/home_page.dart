@@ -150,7 +150,7 @@ class CustomQuizCard extends StatelessWidget {
             Text(
               data['title']!,
               style: TextStyle(
-                fontSize: 24 * height * 0.0053,
+                fontSize: 24 * height * 0.0052,
                 color: Colors.indigo,
                 fontWeight: FontWeight.bold,
               ),
@@ -158,7 +158,7 @@ class CustomQuizCard extends StatelessWidget {
             Image.asset(
               data["icon"]!,
               height: height * 0.30,
-              fit: BoxFit.cover,
+              fit: BoxFit.fitHeight,
               color: Color(int.parse(data["color"]!)),
             ),
           ],
