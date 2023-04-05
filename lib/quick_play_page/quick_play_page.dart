@@ -61,82 +61,171 @@ class _QuickPlayPageState extends State<QuickPlayPage>
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Stack(
-                    children: [
-                      Align(
-                          alignment:
-                              Alignment(0, 1.2 * animationTween.value - 2),
-                          ///Final Value 0.8
-                          child: Text(
-                            widget.data['title']!,
-                            style: const TextStyle(
-                                color: Colors.indigo,
-                                fontSize: 45,
-                                fontWeight: FontWeight.bold),
-                          )),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: height * 0.23 - (kSizeContainerLogo + 0.15 * height)/5,
-                        child: ScaleTransition(
-                          scale: animationRipple,
-                          child: Container(
-                            padding: const EdgeInsets.all(30),
-                            alignment: Alignment.center,
-                            height: kSizeContainerLogo + 0.15 * height,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.indigo.withOpacity(1-animationRipple.value.clamp(0, 1)),
-                                  spreadRadius: 15 * animationRipple.value,
-                                  blurRadius: 10* animationRipple.value,
-                                  offset:
-                                      const Offset(0, 0), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                   Positioned(
-                    left: 0,
-                    right: 0,
-                    top: height * 0.23,
-                    child: Opacity(
-                      opacity:
-                          animationTween.value < 0.2 ? 0 : animationTween.value,
-                      child: Container(
-                        padding: const EdgeInsets.all(30),
-                        alignment: Alignment.center,
-                        height: kSizeContainerLogo,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.indigo.withOpacity(0.3),
-                              spreadRadius: 15,
-                              blurRadius: 10,
-                              offset:
-                                  const Offset(0, 0), // changes position of shadow
+                      left: 20,
+                      right: MediaQuery.of(context).size.width - 63,
+                      top: 50,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text('BACK', style: TextStyle(color: Colors.indigo, fontWeight: FontWeight.bold, fontSize: 16),),
+                            SizedBox(height: 3),
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 2),
+                              height: 2,
+                              //width: 35,
+                              color: Color(int.parse(widget.data["color"]!)),
                             ),
                           ],
                         ),
-                        child: Image.asset(
-                          widget.data["icon"]!,
-                          height: height * 0.15,
-                          fit: BoxFit.contain,
-                          color: Color(int.parse(widget.data["color"]!)),
-                        ),
-                      ),
-                    ),
-                  )
+                      )),
+                  Title(animationTween: animationTween, widget: widget),
+                  RippleContainer(
+                      height: height,
+                      kSizeContainerLogo: kSizeContainerLogo,
+                      animationTween: animationTween,
+                      animationRipple: animationRipple),
+                  IconContainer(
+                    height: height,
+                    animationTween: animationTween,
+                    kSizeContainerLogo: kSizeContainerLogo,
+                    widget: widget,
+                  ),
+                  Positioned(
+                      bottom: 50 * animationTween.value,
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(color: Colors.indigo),
+                      ))
                 ],
               ),
             )));
+  }
+}
+
+class RippleContainer extends StatelessWidget {
+  const RippleContainer({
+    super.key,
+    required this.height,
+    required this.kSizeContainerLogo,
+    required this.animationTween,
+    required this.animationRipple,
+  });
+
+  final double height;
+  final double kSizeContainerLogo;
+  final Animation<double> animationTween;
+  final Animation<double> animationRipple;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      top: height * 0.23 - (kSizeContainerLogo + 0.15 * height) / 5,
+      child: Opacity(
+        opacity: animationTween.value < 0.3 ? 0 : animationTween.value,
+        child: ScaleTransition(
+          scale: animationRipple,
+          child: Container(
+            padding: const EdgeInsets.all(30),
+            alignment: Alignment.center,
+            height: kSizeContainerLogo + 0.15 * height,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.indigo
+                      .withOpacity(1 - animationRipple.value.clamp(0, 1)),
+                  spreadRadius: 15 * animationRipple.value,
+                  blurRadius: 10 * animationRipple.value,
+                  offset: const Offset(0, 0), // changes position of shadow
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class IconContainer extends StatelessWidget {
+  const IconContainer({
+    super.key,
+    required this.height,
+    required this.animationTween,
+    required this.kSizeContainerLogo,
+    required this.widget,
+  });
+
+  final double height;
+  final Animation<double> animationTween;
+  final double kSizeContainerLogo;
+  final QuickPlayPage widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      top: height * 0.23,
+      child: Opacity(
+        opacity: animationTween.value < 0.3 ? 0 : animationTween.value,
+        child: Container(
+          padding: const EdgeInsets.all(30),
+          alignment: Alignment.center,
+          height: kSizeContainerLogo,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.indigo.withOpacity(0.3),
+                spreadRadius: 15,
+                blurRadius: 10,
+                offset: const Offset(0, 0), // changes position of shadow
+              ),
+            ],
+          ),
+          child: Image.asset(
+            widget.data["icon"]!,
+            height: height * 0.15,
+            fit: BoxFit.contain,
+            color: Color(int.parse(widget.data["color"]!)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Title extends StatelessWidget {
+  const Title({
+    super.key,
+    required this.animationTween,
+    required this.widget,
+  });
+
+  final Animation<double> animationTween;
+  final QuickPlayPage widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+        alignment: Alignment(0, 1.2 * animationTween.value - 2),
+
+        ///Final Value 0.8
+        child: Text(
+          widget.data['title']!,
+          style: const TextStyle(
+              color: Colors.indigo, fontSize: 45, fontWeight: FontWeight.bold),
+        ));
   }
 }
