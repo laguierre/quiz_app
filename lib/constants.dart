@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 const kQuizContainerFactor = 0.25;
+const kPadding = 20.0;
 const calendarIcon = "lib/assets/icons/calendar.png";
 const speedIcon = "lib/assets/icons/speed.png";
 const trophyIcon = "lib/assets/icons/trophy.png";
