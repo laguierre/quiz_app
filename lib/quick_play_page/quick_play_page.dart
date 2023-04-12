@@ -12,70 +12,79 @@ class QuickPlayPage extends StatefulWidget {
 
 class _QuickPlayPageState extends State<QuickPlayPage>
     with TickerProviderStateMixin {
-  late AnimationController animationController;
-  late AnimationController animationRippleController;
-  late AnimationController animationCascadeController;
+  late AnimationController tweenAnimationController;
+  late AnimationController rippleAnimationController;
+  late AnimationController cascadeControllerAnimation;
+  late AnimationController playNowControllerAnimation;
   late Animation<double> animationTween;
   late Animation<double> animationRipple;
   late Animation<double> animationButton;
+  late Animation<double> animationPostButton;
+  late bool isButtonCompleted = false;
 
   @override
   void initState() {
     super.initState();
-    animationController =
+    tweenAnimationController =
         AnimationController(duration: const Duration(seconds: 1), vsync: this);
-    animationRippleController = AnimationController(
+    rippleAnimationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1500));
-    animationCascadeController = AnimationController(
-        duration: const Duration(milliseconds: 1500), vsync: this);
+    cascadeControllerAnimation = AnimationController(
+        duration: const Duration(milliseconds: 2500), vsync: this);
+    playNowControllerAnimation = AnimationController(
+        duration: const Duration(milliseconds: 1000), vsync: this);
 
     animationTween = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
-      parent: animationController,
+      parent: tweenAnimationController,
       curve: Curves.linear,
     ))
       ..addListener(() {
-        if (animationController.isCompleted) {
-          animationRippleController.repeat();
-          animationCascadeController.forward();
+        if (tweenAnimationController.isCompleted) {
+          rippleAnimationController.repeat();
+          cascadeControllerAnimation.forward();
         }
         setState(() {});
       });
     animationRipple =
-    Tween<double>(begin: 0.4, end: 1.0).animate(animationRippleController)
-      ..addListener(() {
-        setState(() {});
-      });
+        Tween<double>(begin: 0.4, end: 1.0).animate(rippleAnimationController)
+          ..addListener(() {
+            setState(() {});
+          });
 
     ///Button Animation
     animationButton = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: animationCascadeController, curve: const Interval(0.0, 0.33)),
-    )
-      ..addListener(() {
+          parent: cascadeControllerAnimation,
+          curve: const Interval(0.0, 0.165)),
+    )..addListener(() {
         setState(() {});
       });
-    animationRippleController.repeat();
-    animationController.forward();
+    animationPostButton = Tween<double>(begin: 0.0, end: 90).animate(
+      CurvedAnimation(
+          parent: cascadeControllerAnimation, curve: const Interval(0.165, 1)),
+    )..addListener(() {
+        if (animationPostButton.isCompleted) {
+          isButtonCompleted = true;
+        }
+        setState(() {});
+      });
+    rippleAnimationController.repeat();
+    tweenAnimationController.forward();
   }
 
   @override
   void dispose() {
-    animationController.dispose();
-    animationRippleController.dispose();
-    animationCascadeController.dispose();
+    tweenAnimationController.dispose();
+    rippleAnimationController.dispose();
+    cascadeControllerAnimation.dispose();
+    playNowControllerAnimation.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    double width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     double kSizeContainerLogo = height * 0.25;
     double heightButton = 75.0;
     double topContainerCircles = height * 0.23 + kSizeContainerLogo + 50;
@@ -86,10 +95,7 @@ class _QuickPlayPageState extends State<QuickPlayPage>
         body: Hero(
             tag: widget.data['title']!,
             child: Container(
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height,
+              height: MediaQuery.of(context).size.height,
               color: Colors.white,
               child: Stack(
                 alignment: Alignment.center,
@@ -110,7 +116,11 @@ class _QuickPlayPageState extends State<QuickPlayPage>
                   PlayNowButton(
                       animationTween: animationTween,
                       heightButton: heightButton,
-                      animationButton: animationButton),
+                      animationButton: animationButton,
+                      function: () {
+                        if (isButtonCompleted) {
+                        }
+                      }),
                   LinearProgressBar(
                       heightButton: heightButton,
                       animationButton: animationButton,
@@ -125,50 +135,68 @@ class _QuickPlayPageState extends State<QuickPlayPage>
                         alignment: Alignment.center,
                         children: [
                           Positioned(
-                            top: -kSizeHistoryCircle * 0.5,
+                            top: -double.parse(circles[0]['size']!) * 0.5,
                             bottom: 0,
-                            right: (width - 5) *
-                                animationButton.value -
-                                kSizeHistoryCircle,
+                            right: (width - 5) * animationButton.value -
+                                double.parse(circles[0]['size']!) +
+                                animationPostButton.value,
                             child: TextCircle(
-                              text: circles[0]['title']!,
-                              color: const Color(0xFFF8983C),
-                              size: kSizeHistoryCircle,
-                              animation: animationButton.value,
-                            ),
+                                animation: animationButton.value, index: 0),
                           ),
                           Positioned(
-                              top: kSizeFoodCircle * 2,
-                              bottom: 0,
-                              right: (width - 5) *
-                                  animationButton.value -
-                                  kSizeHistoryCircle,
-                              child: TextCircle(
-                                  text: 'Food',
-                                  color: const Color(0xFFFC2664),
-                                  size: kSizeFoodCircle,
-                                  animation: animationButton.value)),
-
-                          TextCircle(
-                              text: 'Culture',
-                              color: const Color(0xFF37BDF8),
-                              size: 20, animation: animationButton.value,),
-                          /*TextCircle(
-                              text: 'π',
-                              color: Color(0xFF24E5B7),
-                              size: 20),
-                          TextCircle(
-                              text: 'Movies',
-                              color: Color(0xFF392BDE),
-                              size: 20),
-                          TextCircle(
-                              text: 'Music',
-                              color: Color(0xFFF8983C),
-                              size: 20),
-                          TextCircle(
-                              text: 'Comics',
-                              color: Color(0xFF4AD845),
-                              size: 20),*/
+                            top: double.parse(circles[1]['size']!) * 2,
+                            bottom: 0,
+                            right: (width - 5) * animationButton.value -
+                                1.8 * double.parse(circles[1]['size']!) +
+                                animationPostButton.value,
+                            child: TextCircle(
+                                animation: animationButton.value, index: 1),
+                          ),
+                          Positioned(
+                            top: -2.5 * double.parse(circles[2]['size']!),
+                            bottom: 0,
+                            right: (width - 5) * animationButton.value -
+                                3.7 * double.parse(circles[2]['size']!) +
+                                animationPostButton.value,
+                            child: TextCircle(
+                                animation: animationButton.value, index: 2),
+                          ),
+                          Positioned(
+                            top: -0.75 * double.parse(circles[3]['size']!),
+                            bottom: -1.2 * double.parse(circles[3]['size']!),
+                            right: (width - 5) * animationButton.value -
+                                2.35 * double.parse(circles[3]['size']!) +
+                                animationPostButton.value,
+                            child: TextCircle(
+                                animation: animationButton.value, index: 3),
+                          ),
+                          Positioned(
+                            top: -2.70 * double.parse(circles[4]['size']!),
+                            bottom: -1.8 * double.parse(circles[4]['size']!),
+                            right: (width - 5) * animationButton.value -
+                                3.33 * double.parse(circles[4]['size']!) +
+                                animationPostButton.value,
+                            child: TextCircle(
+                                animation: animationButton.value, index: 4),
+                          ),
+                          Positioned(
+                            top: 1.6 * double.parse(circles[5]['size']!),
+                            bottom: 0,
+                            right: (width - 5) * animationButton.value -
+                                4.5 * double.parse(circles[5]['size']!) +
+                                animationPostButton.value,
+                            child: TextCircle(
+                                animation: animationButton.value, index: 5),
+                          ),
+                          Positioned(
+                            top: -1.2 * double.parse(circles[6]['size']!),
+                            bottom: -1.2 * double.parse(circles[6]['size']!),
+                            right: (width - 5) * animationButton.value -
+                                3.35 * double.parse(circles[6]['size']!) +
+                                animationPostButton.value,
+                            child: TextCircle(
+                                animation: animationButton.value, index: 6),
+                          ),
                         ],
                       )),
                 ],
@@ -178,25 +206,25 @@ class _QuickPlayPageState extends State<QuickPlayPage>
 }
 
 class TextCircle extends StatelessWidget {
-  const TextCircle({Key? key,
-    required this.color,
-    required this.text,
-    required this.size,
-    required this.animation})
-      : super(key: key);
-  final Color color;
-  final String text;
-  final double size;
+  const TextCircle({
+    Key? key,
+    required this.animation,
+    required this.index,
+  }) : super(key: key);
   final double animation;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
+    double size = double.parse(circles[index]['size']!);
+    String text = circles[index]['title']!;
+    Color color = Color(int.parse(circles[index]['color']!));
     return Container(
       alignment: Alignment.center,
       height: size * animation,
       width: size * animation,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: Text(text * animation.toInt()!,
+      child: Text(text * animation.toInt(),
           style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold)),
     );
@@ -215,10 +243,7 @@ class BackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned(
         left: 20,
-        right: MediaQuery
-            .of(context)
-            .size
-            .width - 63,
+        right: MediaQuery.of(context).size.width - 63,
         top: 50,
         child: GestureDetector(
           onTap: () {
@@ -296,11 +321,13 @@ class PlayNowButton extends StatelessWidget {
     required this.animationTween,
     required this.heightButton,
     required this.animationButton,
+    required this.function,
   });
 
   final Animation<double> animationTween;
   final double heightButton;
   final Animation<double> animationButton;
+  final VoidCallback function;
 
   @override
   Widget build(BuildContext context) {
@@ -308,38 +335,38 @@ class PlayNowButton extends StatelessWidget {
         bottom: 130 * animationTween.value - 100,
 
         ///Final value: 40
-        child: Container(
-          alignment: Alignment.center,
-          height: heightButton,
-          width: heightButton +
-              (MediaQuery
-                  .of(context)
-                  .size
-                  .width -
-                  heightButton -
-                  2 * kPadding) *
-                  animationButton.value,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(
-                -0.7 * heightButton * animationButton.value + heightButton),
-            color: Colors.indigo,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.indigo.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 5,
-                offset: const Offset(0, 0), // changes position of shadow
+        child: GestureDetector(
+          onTap: function,
+          child: Container(
+            alignment: Alignment.center,
+            height: heightButton,
+            width: heightButton +
+                (MediaQuery.of(context).size.width -
+                        heightButton -
+                        2 * kPadding) *
+                    animationButton.value,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(
+                  -0.7 * heightButton * animationButton.value + heightButton),
+              color: Colors.indigo,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.indigo.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 5,
+                  offset: const Offset(0, 0), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Opacity(
+              opacity: animationButton.value > 0.2 ? animationButton.value : 0,
+              child: const Text(
+                'Play Now',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold),
               ),
-            ],
-          ),
-          child: Opacity(
-            opacity: animationButton.value > 0.2 ? animationButton.value : 0,
-            child: const Text(
-              'Play Now',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold),
             ),
           ),
         ));
