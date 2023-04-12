@@ -7,6 +7,10 @@ const speedIcon = "lib/assets/icons/speed.png";
 const trophyIcon = "lib/assets/icons/trophy.png";
 const userIcon = "lib/assets/icons/user.png";
 
+///Circle Values constants
+const kSizeHistoryCircle = 120.0;
+const kSizeFoodCircle = 60.0;
+
 Map<String, String> userData = {
   "name": "David",
   "surname": "Courtney",
