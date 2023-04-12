@@ -11,6 +11,17 @@ const userIcon = "lib/assets/icons/user.png";
 const kSizeHistoryCircle = 120.0;
 const kSizeFoodCircle = 60.0;
 
+List<Map<String, String>> circles = [
+  {"color": "0xFFF8983C", "title": "History", "size" : "120.0"},
+  {"color": "0xFFFC2664", "title": "Food", "size" : "60.0"},
+  {"color": "0xFF24E5B7", "title": 'π', "size" : "120"},
+  {"color": "0xFF37BDF8", "title": 'Culture', "size" : "120"},
+  {"color": "0xFF37BDF8", "title": 'Culture', "size" : "120"},
+  {"color": "0xFF392BDE", "title": 'Movies', "size" : "120"},
+  {"color": "0xFFF8983C", "title": 'Music', "size" : "120"},
+  {"color": "0xFF4AD845", "title": 'Comics', "size" : "120"},
+];
+
 Map<String, String> userData = {
   "name": "David",
   "surname": "Courtney",

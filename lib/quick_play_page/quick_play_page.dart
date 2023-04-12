@@ -131,7 +131,7 @@ class _QuickPlayPageState extends State<QuickPlayPage>
                                 animationButton.value -
                                 kSizeHistoryCircle,
                             child: TextCircle(
-                              text: 'History',
+                              text: circles[0]['title']!,
                               color: const Color(0xFFF8983C),
                               size: kSizeHistoryCircle,
                               animation: animationButton.value,
@@ -145,15 +145,15 @@ class _QuickPlayPageState extends State<QuickPlayPage>
                                   kSizeHistoryCircle,
                               child: TextCircle(
                                   text: 'Food',
-                                  color: Color(0xFFFC2664),
+                                  color: const Color(0xFFFC2664),
                                   size: kSizeFoodCircle,
                                   animation: animationButton.value)),
 
-                          /*TextCircle(
-                              text: 'Culture',
-                              color: Color(0xFF37BDF8),
-                              size: 20),
                           TextCircle(
+                              text: 'Culture',
+                              color: const Color(0xFF37BDF8),
+                              size: 20, animation: animationButton.value,),
+                          /*TextCircle(
                               text: 'π',
                               color: Color(0xFF24E5B7),
                               size: 20),
