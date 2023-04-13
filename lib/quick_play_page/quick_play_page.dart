@@ -20,7 +20,9 @@ class _QuickPlayPageState extends State<QuickPlayPage>
   late Animation<double> animationRipple;
   late Animation<double> animationButton;
   late Animation<double> animationPostButton;
+  late Animation<double> animationPlayNowClick;
   late bool isButtonCompleted = false;
+  double moveLeftCircles = 0;
 
   @override
   void initState() {
@@ -30,7 +32,7 @@ class _QuickPlayPageState extends State<QuickPlayPage>
     rippleAnimationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1500));
     cascadeControllerAnimation = AnimationController(
-        duration: const Duration(milliseconds: 2500), vsync: this);
+        duration: const Duration(milliseconds: 2000), vsync: this);
     playNowControllerAnimation = AnimationController(
         duration: const Duration(milliseconds: 1000), vsync: this);
 
@@ -68,6 +70,15 @@ class _QuickPlayPageState extends State<QuickPlayPage>
         }
         setState(() {});
       });
+    animationPlayNowClick = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(
+          parent: playNowControllerAnimation, curve: Curves.easeOut),
+    )..addListener(() {
+        setState(() {
+          moveLeftCircles = 50 * (1 - animationPlayNowClick.value);
+        });
+      });
+
     rippleAnimationController.repeat();
     tweenAnimationController.forward();
   }
@@ -119,6 +130,7 @@ class _QuickPlayPageState extends State<QuickPlayPage>
                       animationButton: animationButton,
                       function: () {
                         if (isButtonCompleted) {
+                          playNowControllerAnimation.forward();
                         }
                       }),
                   LinearProgressBar(
@@ -139,63 +151,89 @@ class _QuickPlayPageState extends State<QuickPlayPage>
                             bottom: 0,
                             right: (width - 5) * animationButton.value -
                                 double.parse(circles[0]['size']!) +
-                                animationPostButton.value,
+                                animationPostButton.value +
+                                1 * moveLeftCircles,
                             child: TextCircle(
-                                animation: animationButton.value, index: 0),
+                                animation: animationButton.value,
+                                index: 0,
+                                animationSize: animationPlayNowClick.value),
                           ),
                           Positioned(
                             top: double.parse(circles[1]['size']!) * 2,
                             bottom: 0,
                             right: (width - 5) * animationButton.value -
                                 1.8 * double.parse(circles[1]['size']!) +
-                                animationPostButton.value,
+                                animationPostButton.value +
+                                2 * moveLeftCircles,
                             child: TextCircle(
-                                animation: animationButton.value, index: 1),
+                                animation: animationButton.value,
+                                index: 1,
+                                animationSize: animationPlayNowClick.value),
                           ),
                           Positioned(
                             top: -2.5 * double.parse(circles[2]['size']!),
                             bottom: 0,
                             right: (width - 5) * animationButton.value -
                                 3.7 * double.parse(circles[2]['size']!) +
-                                animationPostButton.value,
+                                animationPostButton.value +
+                                3 * moveLeftCircles,
                             child: TextCircle(
-                                animation: animationButton.value, index: 2),
+                              animation: animationButton.value,
+                              index: 2,
+                              animationSize: animationPlayNowClick.value,
+                            ),
                           ),
                           Positioned(
                             top: -0.75 * double.parse(circles[3]['size']!),
                             bottom: -1.2 * double.parse(circles[3]['size']!),
                             right: (width - 5) * animationButton.value -
                                 2.35 * double.parse(circles[3]['size']!) +
-                                animationPostButton.value,
+                                animationPostButton.value +
+                                4 * moveLeftCircles,
                             child: TextCircle(
-                                animation: animationButton.value, index: 3),
+                              animation: animationButton.value,
+                              index: 3,
+                              animationSize: animationPlayNowClick.value,
+                            ),
                           ),
                           Positioned(
                             top: -2.70 * double.parse(circles[4]['size']!),
                             bottom: -1.8 * double.parse(circles[4]['size']!),
                             right: (width - 5) * animationButton.value -
                                 3.33 * double.parse(circles[4]['size']!) +
-                                animationPostButton.value,
+                                animationPostButton.value +
+                                5 * moveLeftCircles,
                             child: TextCircle(
-                                animation: animationButton.value, index: 4),
+                              animation: animationButton.value,
+                              index: 4,
+                              animationSize: animationPlayNowClick.value,
+                            ),
                           ),
                           Positioned(
                             top: 1.6 * double.parse(circles[5]['size']!),
                             bottom: 0,
                             right: (width - 5) * animationButton.value -
                                 4.5 * double.parse(circles[5]['size']!) +
-                                animationPostButton.value,
+                                animationPostButton.value +
+                                6 * moveLeftCircles,
                             child: TextCircle(
-                                animation: animationButton.value, index: 5),
+                              animation: animationButton.value,
+                              index: 5,
+                              animationSize: animationPlayNowClick.value,
+                            ),
                           ),
                           Positioned(
                             top: -1.2 * double.parse(circles[6]['size']!),
                             bottom: -1.2 * double.parse(circles[6]['size']!),
                             right: (width - 5) * animationButton.value -
                                 3.35 * double.parse(circles[6]['size']!) +
-                                animationPostButton.value,
+                                animationPostButton.value +
+                                7 * moveLeftCircles,
                             child: TextCircle(
-                                animation: animationButton.value, index: 6),
+                              animation: animationButton.value,
+                              index: 6,
+                              animationSize: animationPlayNowClick.value,
+                            ),
                           ),
                         ],
                       )),
@@ -210,8 +248,10 @@ class TextCircle extends StatelessWidget {
     Key? key,
     required this.animation,
     required this.index,
+    required this.animationSize,
   }) : super(key: key);
   final double animation;
+  final double animationSize;
   final int index;
 
   @override
@@ -221,10 +261,10 @@ class TextCircle extends StatelessWidget {
     Color color = Color(int.parse(circles[index]['color']!));
     return Container(
       alignment: Alignment.center,
-      height: size * animation,
-      width: size * animation,
+      height: size * animation * animationSize,
+      width: size * animation * animationSize,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: Text(text * animation.toInt(),
+      child: Text(text * animation.toInt() * animationSize.toInt(),
           style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold)),
     );
