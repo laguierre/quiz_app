@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:quiz_app/constants.dart';
 
+import '../quiz_page/quiz_page.dart';
+
 class QuickPlayPage extends StatefulWidget {
   const QuickPlayPage({Key? key, required this.data}) : super(key: key);
   final Map<String, String> data;
@@ -23,6 +25,8 @@ class _QuickPlayPageState extends State<QuickPlayPage>
   late Animation<double> animationPlayNowClick;
   late bool isButtonCompleted = false;
   double moveLeftCircles = 0;
+  double animationPlayNowValue = 1, animationTweenValue = 0;
+  bool isPlayNowAnimationFinished = false;
 
   @override
   void initState() {
@@ -45,6 +49,7 @@ class _QuickPlayPageState extends State<QuickPlayPage>
           rippleAnimationController.repeat();
           cascadeControllerAnimation.forward();
         }
+        animationTweenValue = tweenAnimationController.value;
         setState(() {});
       });
     animationRipple =
@@ -56,8 +61,7 @@ class _QuickPlayPageState extends State<QuickPlayPage>
     ///Button Animation
     animationButton = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: cascadeControllerAnimation,
-          curve: const Interval(0.0, 0.165)),
+          parent: cascadeControllerAnimation, curve: const Interval(0.0, 0.8)),
     )..addListener(() {
         setState(() {});
       });
@@ -70,12 +74,23 @@ class _QuickPlayPageState extends State<QuickPlayPage>
         }
         setState(() {});
       });
+
+    ///Animation when "Play Now" is clicked
     animationPlayNowClick = Tween<double>(begin: 1, end: 0).animate(
       CurvedAnimation(
           parent: playNowControllerAnimation, curve: Curves.easeOut),
     )..addListener(() {
         setState(() {
+          if (animationPlayNowClick.isCompleted) {
+            Navigator.push(
+                context,
+                PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 0),
+                    reverseTransitionDuration: const Duration(milliseconds: 350),
+                    pageBuilder: (_, __, ___) => QuizPage()));
+          }
           moveLeftCircles = 50 * (1 - animationPlayNowClick.value);
+          animationPlayNowValue = animationPlayNowClick.value;
         });
       });
 
@@ -112,30 +127,37 @@ class _QuickPlayPageState extends State<QuickPlayPage>
                 alignment: Alignment.center,
                 children: [
                   BackButton(widget: widget),
-                  Title(animationTween: animationTween, widget: widget),
+                  Title(
+                      animationTween:
+                          animationTweenValue * animationPlayNowValue,
+                      widget: widget),
                   RippleContainer(
                       height: height,
                       kSizeContainerLogo: kSizeContainerLogo,
-                      animationTween: animationTween,
+                      animationTween:
+                          animationTweenValue * animationPlayNowValue,
                       animationRipple: animationRipple),
                   IconContainer(
                     height: height,
-                    animationTween: animationTween,
+                    animationTween: animationTweenValue * animationPlayNowValue,
                     kSizeContainerLogo: kSizeContainerLogo,
                     widget: widget,
                   ),
                   PlayNowButton(
-                      animationTween: animationTween,
-                      heightButton: heightButton,
-                      animationButton: animationButton,
-                      function: () {
-                        if (isButtonCompleted) {
-                          playNowControllerAnimation.forward();
-                        }
-                      }),
+                    animationTween: animationTween.value,
+                    heightButton: heightButton,
+                    animationButton: animationButton.value,
+                    animationPlayNowValue: animationPlayNowValue,
+                    function: () {
+                      if (isButtonCompleted) {
+                        playNowControllerAnimation.forward();
+                      }
+                    },
+                  ),
                   LinearProgressBar(
                       heightButton: heightButton,
-                      animationButton: animationButton,
+                      animationButton:
+                          animationButton.value * animationPlayNowClick.value,
                       width: width,
                       widget: widget),
                   Positioned(
@@ -321,7 +343,7 @@ class LinearProgressBar extends StatelessWidget {
   });
 
   final double heightButton;
-  final Animation<double> animationButton;
+  final double animationButton;
   final double width;
   final QuickPlayPage widget;
 
@@ -330,7 +352,7 @@ class LinearProgressBar extends StatelessWidget {
     return Positioned(
       bottom: heightButton + 50,
       child: Opacity(
-        opacity: animationButton.value > 0.2 ? animationButton.value : 0,
+        opacity: animationButton > 0.2 ? animationButton : 0,
         child: Column(
           children: [
             Text('Waiting for players',
@@ -343,7 +365,7 @@ class LinearProgressBar extends StatelessWidget {
                 width: width - kPadding,
                 barRadius: const Radius.circular(5),
                 lineHeight: 10.0,
-                percent: animationButton.value,
+                percent: animationButton,
                 backgroundColor: Colors.grey.shade300,
                 progressColor: Color(
                   int.parse(widget.data["color"]!),
@@ -362,32 +384,35 @@ class PlayNowButton extends StatelessWidget {
     required this.heightButton,
     required this.animationButton,
     required this.function,
+    required this.animationPlayNowValue,
   });
 
-  final Animation<double> animationTween;
+  final double animationTween;
   final double heightButton;
-  final Animation<double> animationButton;
+  final double animationButton;
+  final double animationPlayNowValue;
   final VoidCallback function;
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    double opacity = animationPlayNowValue * animationButton;
     return Positioned(
-        bottom: 130 * animationTween.value - 100,
+        bottom: (130 * animationTween - 100) * animationPlayNowValue,
 
         ///Final value: 40
         child: GestureDetector(
           onTap: function,
           child: Container(
             alignment: Alignment.center,
-            height: heightButton,
-            width: heightButton +
-                (MediaQuery.of(context).size.width -
-                        heightButton -
-                        2 * kPadding) *
-                    animationButton.value,
+            height: heightButton + (1 - animationPlayNowValue) * height,
+            width: (heightButton + width * animationButton)
+                .clamp(0, width - 2 * kPadding * animationPlayNowValue),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(
-                  -0.7 * heightButton * animationButton.value + heightButton),
+                  (-0.7 * heightButton * animationButton + heightButton) *
+                      animationPlayNowValue),
               color: Colors.indigo,
               boxShadow: [
                 BoxShadow(
@@ -399,7 +424,7 @@ class PlayNowButton extends StatelessWidget {
               ],
             ),
             child: Opacity(
-              opacity: animationButton.value > 0.2 ? animationButton.value : 0,
+              opacity: opacity > 0.2 ? opacity : 0,
               child: const Text(
                 'Play Now',
                 style: TextStyle(
@@ -424,7 +449,7 @@ class RippleContainer extends StatelessWidget {
 
   final double height;
   final double kSizeContainerLogo;
-  final Animation<double> animationTween;
+  final double animationTween;
   final Animation<double> animationRipple;
 
   @override
@@ -434,7 +459,7 @@ class RippleContainer extends StatelessWidget {
       right: 0,
       top: height * 0.23 - (kSizeContainerLogo + 0.15 * height) / 5,
       child: Opacity(
-        opacity: animationTween.value < 0.3 ? 0 : animationTween.value,
+        opacity: animationTween < 0.3 ? 0 : animationTween,
         child: ScaleTransition(
           scale: animationRipple,
           child: Container(
@@ -471,7 +496,7 @@ class IconContainer extends StatelessWidget {
   });
 
   final double height;
-  final Animation<double> animationTween;
+  final double animationTween;
   final double kSizeContainerLogo;
   final QuickPlayPage widget;
 
@@ -482,7 +507,7 @@ class IconContainer extends StatelessWidget {
       right: 0,
       top: height * 0.23,
       child: Opacity(
-        opacity: animationTween.value < 0.3 ? 0 : animationTween.value,
+        opacity: animationTween < 0.3 ? 0 : animationTween,
         child: Container(
           padding: const EdgeInsets.all(30),
           alignment: Alignment.center,
@@ -518,13 +543,13 @@ class Title extends StatelessWidget {
     required this.widget,
   });
 
-  final Animation<double> animationTween;
+  final double animationTween;
   final QuickPlayPage widget;
 
   @override
   Widget build(BuildContext context) {
     return Align(
-        alignment: Alignment(0, 1.2 * animationTween.value - 2),
+        alignment: Alignment(0, 1.2 * animationTween - 2),
 
         ///Final Value 0.8
         child: Text(
