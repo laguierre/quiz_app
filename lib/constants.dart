@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 const kQuizContainerFactor = 0.25;
@@ -6,10 +7,20 @@ const calendarIcon = "lib/assets/icons/calendar.png";
 const speedIcon = "lib/assets/icons/speed.png";
 const trophyIcon = "lib/assets/icons/trophy.png";
 const userIcon = "lib/assets/icons/user.png";
+const rightArrowIcon = "lib/assets/icons/right_arrow.png";
 
 ///Circle Values constants
 const kSizeHistoryCircle = 120.0;
 const kSizeFoodCircle = 60.0;
+
+///Colors
+Color kColorPlayNow = const Color(0xFF1340BA);
+Color kColorClickQuizButton = const Color(0xFF2BB8EE);
+///Lottie Files
+const jsonLottieQuiz = "lib/assets/json/quiz.json";
+const jsonLottieCorrect = "lib/assets/json/correct.json";
+const jsonLottieWrong = "lib/assets/json/wrong.json";
+
 
 List<Map<String, String>> circles = [
   {"color": "0xFFFEBB16", "title": "History", "size" : "110.0"},
@@ -56,3 +67,5 @@ List<Map<String, String>> data = [
     "color": "0xFF9769E0"
   },
 ];
+
+List<String> quizAnswers = ['Krypton', 'Asgard', 'Azeroth'];

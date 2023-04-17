@@ -87,7 +87,7 @@ class _QuickPlayPageState extends State<QuickPlayPage>
                 PageRouteBuilder(
                     transitionDuration: const Duration(milliseconds: 0),
                     reverseTransitionDuration: const Duration(milliseconds: 350),
-                    pageBuilder: (_, __, ___) => QuizPage()));
+                    pageBuilder: (_, __, ___) => QuizPage(data: widget.data)));
           }
           moveLeftCircles = 50 * (1 - animationPlayNowClick.value);
           animationPlayNowValue = animationPlayNowClick.value;
@@ -413,10 +413,10 @@ class PlayNowButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(
                   (-0.7 * heightButton * animationButton + heightButton) *
                       animationPlayNowValue),
-              color: Colors.indigo,
+              color: kColorPlayNow,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.indigo.withOpacity(0.5),
+                  color: kColorPlayNow.withOpacity(0.5),
                   spreadRadius: 5,
                   blurRadius: 5,
                   offset: const Offset(0, 0), // changes position of shadow
