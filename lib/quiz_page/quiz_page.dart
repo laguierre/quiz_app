@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quiz_app/constants.dart';
 import 'package:quiz_app/home_page/home_page.dart';
-
 import 'quiz_page_widgets.dart';
 
 class QuizPage extends StatefulWidget {
@@ -172,42 +171,45 @@ class _QuizPageState extends State<QuizPage> with TickerProviderStateMixin {
                       onClickController.forward();
                       setState(() {
                         quizPressButton = index;
-                        Future.delayed(const Duration(milliseconds: 2700), (){
-                          Navigator.pushAndRemoveUntil(context,
-                              MaterialPageRoute(builder: (_) => const HomePage()), (route) => false);
+                        Future.delayed(const Duration(milliseconds: 2700), () {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const HomePage()),
+                              (route) => false);
                         });
                       });
                     },
                   );
                 },
               )),
-          if(onClickValue  == 1 && isAnswerAnimationFinished)
-              Positioned(
-                  bottom: 0,
-                  left: quizPressButton == 0? 0: 120,
-                  right: quizPressButton == 0? 0: 120,
-                  top: 0,
-                  child: quizPressButton == 0
-                      ? Lottie.asset(jsonLottieCorrect, repeat: false)
-                      : SizedBox(child: Lottie.asset(jsonLottieWrong, repeat: false)),
+          if (onClickValue == 1 && isAnswerAnimationFinished)
+            Positioned(
+              bottom: 0,
+              left: quizPressButton == 0 ? 0 : 120,
+              right: quizPressButton == 0 ? 0 : 120,
+              top: 0,
+              child: quizPressButton == 0
+                  ? Lottie.asset(jsonLottieCorrect, repeat: false)
+                  : SizedBox(
+                      child: Lottie.asset(jsonLottieWrong, repeat: false)),
+            ),
+          if (onClickValue == 1 && isAnswerAnimationFinished)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              top: height * 0.25,
+              child: Center(
+                child: Text(
+                  quizAnswers[quizPressButton],
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold),
                 ),
-
-    if(onClickValue  == 1 && isAnswerAnimationFinished)
-              Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  top: height * 0.25,
-                  child: Center(
-                    child: Text(
-                      quizAnswers[quizPressButton],
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                )
+              ),
+            )
         ],
       ),
     );
