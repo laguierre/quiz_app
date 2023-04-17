@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quiz_app/constants.dart';
+import 'package:quiz_app/home_page/home_page.dart';
 
 import 'quiz_page_widgets.dart';
 
@@ -31,6 +32,7 @@ class _QuizPageState extends State<QuizPage> with TickerProviderStateMixin {
   double onClickValue = 0;
   double clickedAnswerValue = 0;
   bool isStartedPage = false;
+  bool isAnswerAnimationFinished = false;
   int quizPressButton = -1;
 
   @override
@@ -99,13 +101,14 @@ class _QuizPageState extends State<QuizPage> with TickerProviderStateMixin {
       });
 
     clickedAnswerAnimation =
-        Tween<double>(begin: 0, end: 800).animate(CurvedAnimation(
+        Tween<double>(begin: 0, end: 850).animate(CurvedAnimation(
       parent: clickedAnswerController,
       curve: Curves.linear,
     ))
           ..addListener(() {
             setState(() {
               clickedAnswerValue = clickedAnswerAnimation.value;
+              isAnswerAnimationFinished = true;
             });
           });
 
@@ -169,13 +172,17 @@ class _QuizPageState extends State<QuizPage> with TickerProviderStateMixin {
                       onClickController.forward();
                       setState(() {
                         quizPressButton = index;
+                        Future.delayed(const Duration(milliseconds: 2700), (){
+                          Navigator.pushAndRemoveUntil(context,
+                              MaterialPageRoute(builder: (_) => const HomePage()), (route) => false);
+                        });
                       });
                     },
                   );
                 },
               )),
-          onClickValue == 1
-              ? Positioned(
+          if(onClickValue  == 1 && isAnswerAnimationFinished)
+              Positioned(
                   bottom: 0,
                   left: quizPressButton == 0? 0: 120,
                   right: quizPressButton == 0? 0: 120,
@@ -183,10 +190,10 @@ class _QuizPageState extends State<QuizPage> with TickerProviderStateMixin {
                   child: quizPressButton == 0
                       ? Lottie.asset(jsonLottieCorrect, repeat: false)
                       : SizedBox(child: Lottie.asset(jsonLottieWrong, repeat: false)),
-                )
-              : Container(),
-          onClickValue == 1
-              ? Positioned(
+                ),
+
+    if(onClickValue  == 1 && isAnswerAnimationFinished)
+              Positioned(
                   bottom: 0,
                   left: 0,
                   right: 0,
@@ -201,103 +208,7 @@ class _QuizPageState extends State<QuizPage> with TickerProviderStateMixin {
                     ),
                   ),
                 )
-              : Container(),
         ],
-      ),
-    );
-  }
-}
-
-class LottieBottom extends StatelessWidget {
-  const LottieBottom({
-    super.key,
-    required this.clickedAnswerController,
-    required this.height,
-    required this.backgroundCirclesValue,
-  });
-
-  final AnimationController clickedAnswerController;
-  final double height;
-  final double backgroundCirclesValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-        bottom: -10 - clickedAnswerController.value * 10,
-        left: 0,
-        right: 0,
-        height: height * 0.30 * backgroundCirclesValue +
-            clickedAnswerController.value * 50,
-        child: Lottie.asset(jsonLottieQuiz, frameRate: FrameRate(120)));
-  }
-}
-
-class AnswerButton extends StatelessWidget {
-  const AnswerButton({
-    super.key,
-    required this.text,
-    required this.opacity,
-    required this.onTap,
-    required this.animationOnClink,
-    this.isPressed = false,
-  });
-
-  final String text;
-  final double opacity;
-  final VoidCallback onTap;
-  final double animationOnClink;
-  final bool isPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double heightIcon = 25;
-    return Opacity(
-      opacity: opacity,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                margin: EdgeInsets.symmetric(
-                    horizontal: kPadding * (1 - 0.7 * animationOnClink),
-                    vertical: 10),
-                padding: const EdgeInsets.all(kPadding),
-                decoration: BoxDecoration(
-                    color:
-                        isPressed ? kColorClickQuizButton : Colors.transparent,
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20)),
-                    border:
-                        Border.all(width: 2, color: const Color(0xFF6882FA))),
-                child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                            maxWidth: width -
-                                2 * heightIcon -
-                                kPadding * 2 * (1 - 0.7 * animationOnClink)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              text,
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 28),
-                            ),
-                            Image.asset(
-                              rightArrowIcon,
-                              color: Colors.white,
-                              fit: BoxFit.fitHeight,
-                              height: heightIcon,
-                            )
-                          ],
-                        ))))
-          ],
-        ),
       ),
     );
   }

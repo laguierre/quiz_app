@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:quiz_app/quiz_page/quiz_page.dart';
 
@@ -115,3 +116,99 @@ class TimeOutIndicator extends StatelessWidget {
     );
   }
 }
+
+class LottieBottom extends StatelessWidget {
+  const LottieBottom({
+    super.key,
+    required this.clickedAnswerController,
+    required this.height,
+    required this.backgroundCirclesValue,
+  });
+
+  final AnimationController clickedAnswerController;
+  final double height;
+  final double backgroundCirclesValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+        bottom: -10 - clickedAnswerController.value * 10,
+        left: 0,
+        right: 0,
+        height: height * 0.30 * backgroundCirclesValue +
+            clickedAnswerController.value * 50,
+        child: Lottie.asset(jsonLottieQuiz, frameRate: FrameRate(120)));
+  }
+}
+
+class AnswerButton extends StatelessWidget {
+  const AnswerButton({
+    super.key,
+    required this.text,
+    required this.opacity,
+    required this.onTap,
+    required this.animationOnClink,
+    this.isPressed = false,
+  });
+
+  final String text;
+  final double opacity;
+  final VoidCallback onTap;
+  final double animationOnClink;
+  final bool isPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double heightIcon = 25;
+    return Opacity(
+      opacity: opacity,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                margin: EdgeInsets.symmetric(
+                    horizontal: kPadding * (1 - 0.7 * animationOnClink),
+                    vertical: 10),
+                padding: const EdgeInsets.all(kPadding),
+                decoration: BoxDecoration(
+                    color:
+                    isPressed ? kColorClickQuizButton : Colors.transparent,
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20)),
+                    border:
+                    Border.all(width: 2, color: const Color(0xFF6882FA))),
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                            maxWidth: width -
+                                2.5 * heightIcon -
+                                kPadding * 2 * (1 - 0.7 * animationOnClink)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              text,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 28),
+                            ),
+                            Image.asset(
+                              rightArrowIcon,
+                              color: Colors.white,
+                              fit: BoxFit.fitHeight,
+                              height: heightIcon,
+                            )
+                          ],
+                        ))))
+          ],
+        ),
+      ),
+    );
+  }
+}
+
